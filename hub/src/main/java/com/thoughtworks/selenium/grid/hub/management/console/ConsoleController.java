@@ -1,18 +1,23 @@
 package com.thoughtworks.selenium.grid.hub.management.console;
 
-import com.thoughtworks.selenium.grid.hub.HubRegistry;
-import com.thoughtworks.selenium.grid.hub.management.console.mvc.Controller;
-import com.thoughtworks.selenium.grid.hub.management.console.mvc.Page;
+import java.io.IOException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+
+import com.thoughtworks.selenium.grid.hub.HubRegistry;
+import com.thoughtworks.selenium.grid.hub.management.box.BoxPool;
+import com.thoughtworks.selenium.grid.hub.management.console.mvc.Controller;
+import com.thoughtworks.selenium.grid.hub.management.console.mvc.Page;
 
 
 public class ConsoleController extends Controller {
 
-    public ConsoleController(HubRegistry registry) {
+    private final BoxPool pool;
+
+	public ConsoleController(HubRegistry registry, BoxPool pool) {
         super(registry);
+		this.pool = pool;
     }
 
     public void process(HttpServletResponse response) throws ServletException, IOException {
@@ -27,7 +32,7 @@ public class ConsoleController extends Controller {
         page.set("environments", registry().environmentManager().environments());
         page.set("availableRemoteControls", registry().remoteControlPool().availableRemoteControls());
         page.set("reservedRemoteControls", registry().remoteControlPool().reservedRemoteControls());
-
+        page.set("boxes", pool.getBoxes());
         return page;
     }
 

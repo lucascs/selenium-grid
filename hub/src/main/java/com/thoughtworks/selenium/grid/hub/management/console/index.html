@@ -49,6 +49,12 @@
       clear: both;
       text-align: center;
     }
+    strong.red {
+       color: red;
+    }
+    strong.green {
+       color: green;
+    }
   </style>
 </head>
 
@@ -98,6 +104,53 @@
       </tr>
     </#list>
     </table>
+  </div>
+  <div class="section">
+    <h2>Boxes</h2>
+    <script type="text/javascript">
+    	function toggle(id) {
+    		document.getElementById(id).style.display = 'block';
+    	}
+    	function setHost(form) {
+        	var input = document.createElement('input');
+        	input.type = 'hidden';
+        	input.name = 'hubURL';
+        	input.value = 'http://' + document.location.host;
+        	form.appendChild(input); 
+    	}
+    </script>
+    <table>
+      <tr><th>Status</th><th>Host</th> <th>Port</th> <th>Quantity</th> <th>From Port</th> <th>Environment</th> </tr>
+    <#list boxes as box>
+	      <tr>
+          <form action="/box-registration-manager/start" method="get" onsubmit="setHost(this)">
+          	  <td><#if box.up()>
+          	  		<strong class="green">Up</strong>
+          	  	  <#else>
+          	  		<strong class="red">Down</strong>
+				  </#if>          	  	  
+	          <td>${box.host()}<input type="hidden" name="host" value="${box.host()}"/></td>
+	          <td>#{box.port()}<input type="hidden" name="port" value="#{box.port()}"/></td>
+	          <td><input type="text" name="quantity" value="#{box.quantity()}" style="width: 40px"/> </td>
+	          <td><input type="text" name="portStart" value="#{box.startPort()}" style="width: 80px"/> </td>
+	          <td><select name="environment">
+	          		<#list environments as environment>
+				        <option value="${environment.name()}">${environment.browser()}</option>
+					 </#list>
+	          	</select>
+	       		<td><input type="submit" value="Start" /> </td>
+          </form>
+	      </tr>
+    </#list>
+    </table>
+    <a href="javascript:toggle('add-box')">Add box</a>
+    <div id="add-box" style="display: none"> 
+    	<form action="/box-registration-manager/register" method="get">
+    		Host: <input type="text" name="host"/> <br />
+    		Port: <input type="text" name="port"/> <br />
+    		<input type="submit" /> 
+    	</form>
+    </div>
   </div>
   <div id="feedback">
     <p>

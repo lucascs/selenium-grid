@@ -1,15 +1,17 @@
 package com.thoughtworks.selenium.grid.hub.management.console;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.io.IOException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.thoughtworks.selenium.grid.hub.HubRegistry;
+import com.thoughtworks.selenium.grid.hub.management.box.BoxPool;
 
 /**
  * Gateway to Selenium Farm.
@@ -19,8 +21,14 @@ import com.thoughtworks.selenium.grid.hub.HubRegistry;
 public class ConsoleServlet extends HttpServlet {
 
     private static final Log logger = LogFactory.getLog(ConsoleServlet.class);
+	private final BoxPool pool;
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    public ConsoleServlet(BoxPool pool) {
+		this.pool = pool;
+	}
+
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         logger.debug("Rendering console...");
@@ -28,6 +36,6 @@ public class ConsoleServlet extends HttpServlet {
     }
 
     protected ConsoleController controller() {
-        return new ConsoleController(HubRegistry.registry());
+        return new ConsoleController(HubRegistry.registry(), pool);
     }
 }
