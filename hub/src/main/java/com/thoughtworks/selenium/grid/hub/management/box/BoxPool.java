@@ -10,6 +10,12 @@ import java.util.List;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
+/**
+ * 
+ * @author Lucas Cavalcanti
+ * @author Guilherme Silveira
+ *
+ */
 public class BoxPool {
 
 	private List<Box> boxes = new ArrayList<Box>();

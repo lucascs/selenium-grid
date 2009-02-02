@@ -6,6 +6,12 @@ import org.apache.commons.logging.LogFactory;
 import com.thoughtworks.selenium.grid.HttpClient;
 import com.thoughtworks.selenium.grid.Response;
 
+/**
+ * 
+ * @author Lucas Cavalcanti
+ * @author Guilherme Silveira
+ *
+ */
 public class Pinger implements Runnable {
 	private static final Log LOGGER = LogFactory.getLog(Pinger.class);
 	private static final int SECONDS = 1000;

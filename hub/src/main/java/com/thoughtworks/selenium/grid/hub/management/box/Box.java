@@ -13,7 +13,12 @@ import com.thoughtworks.selenium.grid.hub.Hub;
 import com.thoughtworks.selenium.grid.hub.HubRegistry;
 import com.thoughtworks.selenium.grid.hub.remotecontrol.DynamicRemoteControlPool;
 import com.thoughtworks.selenium.grid.hub.remotecontrol.RemoteControlProxy;
-
+/**
+ * 
+ * @author Lucas Cavalcanti
+ * @author Guilherme Silveira
+ *
+ */
 public class Box {
 
 	private static final Log LOGGER = LogFactory.getLog(Box.class);

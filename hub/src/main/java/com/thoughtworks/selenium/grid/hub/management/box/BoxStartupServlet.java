@@ -12,9 +12,10 @@ import com.thoughtworks.selenium.grid.hub.Hub;
 import com.thoughtworks.selenium.grid.hub.management.RegistrationManagementServlet;
 
 /**
- * Servlet used by Selenium Remote Control to register themselves to the grid.
+ * 
+ * @author Lucas Cavalcanti
+ * @author Guilherme Silveira
  *
- * @author Philippe Hanrigou
  */
 public class BoxStartupServlet extends RegistrationManagementServlet {
 
