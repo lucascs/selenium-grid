@@ -26,7 +26,8 @@ public class Box {
 	private final int port;
 	private int defaultStartPort;
 	private int defaultQuantity;
-	private Status status;
+	private transient Status status;
+	private transient List<RemoteControl> registeredRCs = new ArrayList<RemoteControl>();
 	
 	public static enum Status {
 		ONLINE, OFFLINE
@@ -63,21 +64,18 @@ public class Box {
 	
 	private void killRemotes() {
 		DynamicRemoteControlPool pool = HubRegistry.registry().remoteControlPool();
-		List<RemoteControlProxy> downRCs = new ArrayList<RemoteControlProxy>();
-		for(RemoteControlProxy proxy : pool.availableRemoteControls()) {
-			if (proxy.host().equals(host()) && proxy.port() == port()) {
-				downRCs.add(proxy);
-			}
-		}
-		for(RemoteControlProxy proxy : pool.reservedRemoteControls()) {
-			if (proxy.host().equals(host()) && proxy.port() == port()) {
-				downRCs.add(proxy);
-			}
-		}
-		for (RemoteControlProxy proxy : downRCs) {
-			pool.unregister(proxy);
-		}
+		List<RemoteControlProxy> rcs = new ArrayList<RemoteControlProxy>();
+		rcs.addAll(pool.availableRemoteControls());
+		rcs.addAll(pool.reservedRemoteControls());
 		
+		for(RemoteControlProxy proxy : rcs) {
+			for (RemoteControl rc : getRegisteredRCs()) {
+				if (proxy.host().equals(rc.host) && proxy.port() == rc.port) {
+					pool.unregister(proxy);
+					continue;
+				}
+			}
+		}
 	}
 
 	public boolean up() {
@@ -93,10 +91,32 @@ public class Box {
 					"hubURL=%s&portStart=%d",
 					host, port, host, n, environment, hub.url(), portStart);
 			Response response = client.get(url);
-			return response.statusCode() == 200; 
+			boolean successful = response.statusCode() == 200;
+			if (successful) {
+				for (int i = 0; i < n; i++) {
+					getRegisteredRCs().add(new RemoteControl(host, portStart + i));
+				}
+			}
+			return successful; 
 		} catch (IOException e) {
 			LOGGER.error(e);
 			return false;
+		}
+	}
+	
+	private List<RemoteControl> getRegisteredRCs() {
+		if (registeredRCs == null) {
+			registeredRCs = new ArrayList<RemoteControl>();
+		}
+		return registeredRCs;
+	}
+
+	private static class RemoteControl {
+		String host;
+		int port;
+		public RemoteControl(String host, int port) {
+			this.host = host;
+			this.port = port;
 		}
 	}
 	

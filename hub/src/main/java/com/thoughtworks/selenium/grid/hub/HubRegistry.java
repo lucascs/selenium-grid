@@ -1,13 +1,14 @@
 package com.thoughtworks.selenium.grid.hub;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.thoughtworks.selenium.grid.configuration.EnvironmentConfiguration;
 import com.thoughtworks.selenium.grid.configuration.GridConfiguration;
 import com.thoughtworks.selenium.grid.configuration.ResourceLocator;
+import com.thoughtworks.selenium.grid.hub.management.LifecycleManager;
 import com.thoughtworks.selenium.grid.hub.remotecontrol.DynamicRemoteControlPool;
 import com.thoughtworks.selenium.grid.hub.remotecontrol.GlobalRemoteControlPool;
-import com.thoughtworks.selenium.grid.hub.management.LifecycleManager;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Hub application registry.

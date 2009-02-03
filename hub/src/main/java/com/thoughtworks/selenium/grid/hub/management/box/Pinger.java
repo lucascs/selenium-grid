@@ -28,13 +28,13 @@ public class Pinger implements Runnable {
 					Response response = new HttpClient().get("http://" + box.host() + ":" + box.port() + "/ping");
 					if (response.statusCode() == 200) {
 						box.setUp();
-					} else {
-						box.setDown();
+						continue;
 					}
 				} catch (Exception e) {
 					// should live forever
 					LOGGER.warn(e);
 				}
+				box.setDown();
 			}
 			try {
 				Thread.sleep(60*SECONDS);
