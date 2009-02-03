@@ -1,5 +1,6 @@
 package com.thoughtworks.selenium.grid.hub.management.box;
 
+import java.io.File;
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,9 +22,11 @@ public class BoxStartupServlet extends RegistrationManagementServlet {
 
     private static final Log LOGGER = LogFactory.getLog(BoxStartupServlet.class);
 	private final BoxPool pool;
+	private final File boxFile;
 
-    public BoxStartupServlet(BoxPool pool) {
+    public BoxStartupServlet(BoxPool pool, File boxFile) {
 		this.pool = pool;
+		this.boxFile = boxFile;
 	}
 
 	@Override
@@ -37,6 +40,7 @@ public class BoxStartupServlet extends RegistrationManagementServlet {
 		int portStart = Integer.parseInt(request.getParameter("portStart"));
 		// the hub object should be created on server startup reading a config information
 		boolean started = box.startRemoteControls(n, request.getParameter("environment"), portStart, new Hub(hubURL));
+		pool.saveTo(boxFile);
 		if (started) {
 	        LOGGER.info("Started " + n + " remote controls @ " + box);
 	        writeSuccessfulResponse(response);

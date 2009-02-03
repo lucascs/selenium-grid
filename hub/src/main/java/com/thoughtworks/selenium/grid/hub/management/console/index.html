@@ -135,9 +135,14 @@
 	          <td><input type="text" name="portStart" value="#{box.startPort()}" style="width: 80px"/> </td>
 	          <td><select name="environment">
 	          		<#list environments as environment>
-				        <option value="${environment.name()}">${environment.browser()}</option>
+				        <option value="${environment.name()}" 
+				        <#if environment.name() == box.environment()>
+				        selected="selected"
+				        </#if> 
+				        >${environment.browser()}</option>
 					 </#list>
 	          	</select>
+	          	</td>
 	       		<td><input type="submit" value="Start" /> </td>
           </form>
 	      </tr>

@@ -28,6 +28,8 @@ public class Box {
 	private int defaultQuantity;
 	private transient Status status;
 	private transient List<Integer> rcPorts = new ArrayList<Integer>();
+	private String defaultEnvironment;
+	private String defaultHubUrl;
 	
 	public static enum Status {
 		ONLINE, OFFLINE
@@ -37,12 +39,21 @@ public class Box {
 		this.port = port;
 		this.defaultStartPort = 5555;
 		this.defaultQuantity = 1;
+		this.defaultEnvironment = "*firefox";
 		this.status = Status.ONLINE;
 	}
 
 	public int quantity() {
 		return defaultQuantity;
 	}
+	
+	public String environment() {
+		if (defaultEnvironment == null) {
+			defaultEnvironment = "*firefox";
+		}
+		return defaultEnvironment;
+	}
+	
 	public int startPort() {
 		return defaultStartPort;
 	}
@@ -55,6 +66,9 @@ public class Box {
 	}
 
 	public void setUp() {
+		if (!Status.ONLINE.equals(this.status) && defaultHubUrl != null) {
+			startRemoteControls(defaultQuantity, defaultEnvironment, defaultStartPort, new Hub(defaultHubUrl));
+		}
 		this.status = Status.ONLINE;
 	}
 	public void setDown() {
@@ -87,6 +101,8 @@ public class Box {
 		HttpClient client = new HttpClient();
 		this.defaultStartPort = portStart;
 		this.defaultQuantity = n;
+		this.defaultEnvironment = environment;
+		this.defaultHubUrl = hub.url();
 		try {
 			String url = String.format("http://%s:%d/remote-control-manager/start?host=%s&quantity=%d&environment=%s&" +
 					"hubURL=%s&portStart=%d",

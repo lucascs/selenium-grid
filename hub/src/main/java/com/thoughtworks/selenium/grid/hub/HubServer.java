@@ -50,7 +50,7 @@ public class HubServer {
         root.addServlet(new ServletHolder(new LifecycleManagerServlet()), "/lifecycle-manager");
 
         root.addServlet(new ServletHolder(new BoxRegistrationServlet(pool, boxFile)), "/box-registration-manager/register");
-        root.addServlet(new ServletHolder(new BoxStartupServlet(pool)), "/box-registration-manager/start");
+        root.addServlet(new ServletHolder(new BoxStartupServlet(pool, boxFile)), "/box-registration-manager/start");
 
         Thread thread = new Thread(new Pinger(pool));
         thread.setDaemon(false);
