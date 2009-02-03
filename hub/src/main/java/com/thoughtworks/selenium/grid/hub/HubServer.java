@@ -14,6 +14,7 @@ import com.thoughtworks.selenium.grid.hub.management.UnregistrationServlet;
 import com.thoughtworks.selenium.grid.hub.management.box.BoxPool;
 import com.thoughtworks.selenium.grid.hub.management.box.BoxRegistrationServlet;
 import com.thoughtworks.selenium.grid.hub.management.box.BoxStartupServlet;
+import com.thoughtworks.selenium.grid.hub.management.box.BoxUnregistrationServlet;
 import com.thoughtworks.selenium.grid.hub.management.box.Pinger;
 import com.thoughtworks.selenium.grid.hub.management.console.ConsoleServlet;
 
@@ -50,6 +51,7 @@ public class HubServer {
         root.addServlet(new ServletHolder(new LifecycleManagerServlet()), "/lifecycle-manager");
 
         root.addServlet(new ServletHolder(new BoxRegistrationServlet(pool, boxFile)), "/box-registration-manager/register");
+        root.addServlet(new ServletHolder(new BoxUnregistrationServlet(pool, boxFile)), "/box-registration-manager/unregister");
         root.addServlet(new ServletHolder(new BoxStartupServlet(pool, boxFile)), "/box-registration-manager/start");
 
         Thread thread = new Thread(new Pinger(pool));

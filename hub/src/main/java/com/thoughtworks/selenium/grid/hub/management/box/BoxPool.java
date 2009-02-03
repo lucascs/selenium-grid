@@ -65,4 +65,10 @@ public class BoxPool {
 		throw new IllegalArgumentException("Attempt to start box that was not already registered");
 	}
 
+	public void unregister(Box box) {
+		Box loaded = load(box);
+		loaded.setDown();
+		boxes.remove(loaded);
+	}
+
 }

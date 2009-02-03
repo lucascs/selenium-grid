@@ -49,10 +49,10 @@
       clear: both;
       text-align: center;
     }
-    strong.red {
+    .red {
        color: red;
     }
-    strong.green {
+    .green {
        color: green;
     }
   </style>
@@ -87,6 +87,9 @@
           <td>${remoteControl.host()}</td>
           <td>#{remoteControl.port()}</td>
           <td>${remoteControl.environment()}</td>
+          <td><a class="red" 
+          href="/registration-manager/unregister?host=${remoteControl.host()}&port=#{remoteControl.port()}&environment=${remoteControl.environment()}">
+          	<strong>X</strong></a></td>
         </tr>
       </#list>
     </table>
@@ -145,6 +148,11 @@
 	          	</td>
 	       		<td><input type="submit" value="Start" /> </td>
           </form>
+ 	         	<td>
+          		<a class="red" href="/box-registration-manager/unregister?host=${box.host()}&port=#{box.port()}">
+      				<strong>X</strong>
+      				</a>
+    	      	</td>
 	      </tr>
     </#list>
     </table>
