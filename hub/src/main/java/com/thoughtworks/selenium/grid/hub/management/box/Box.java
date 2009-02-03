@@ -27,7 +27,7 @@ public class Box {
 	private int defaultStartPort;
 	private int defaultQuantity;
 	private transient Status status;
-	private transient List<RemoteControl> registeredRCs = new ArrayList<RemoteControl>();
+	private transient List<Integer> rcPorts = new ArrayList<Integer>();
 	
 	public static enum Status {
 		ONLINE, OFFLINE
@@ -69,13 +69,14 @@ public class Box {
 		rcs.addAll(pool.reservedRemoteControls());
 		
 		for(RemoteControlProxy proxy : rcs) {
-			for (RemoteControl rc : getRegisteredRCs()) {
-				if (proxy.host().equals(rc.host) && proxy.port() == rc.port) {
+			for (Integer port : getRcPorts()) {
+				if (proxy.host().equals(host()) && proxy.port() == port) {
 					pool.unregister(proxy);
 					continue;
 				}
 			}
 		}
+		getRcPorts().clear();
 	}
 
 	public boolean up() {
@@ -94,7 +95,7 @@ public class Box {
 			boolean successful = response.statusCode() == 200;
 			if (successful) {
 				for (int i = 0; i < n; i++) {
-					getRegisteredRCs().add(new RemoteControl(host, portStart + i));
+					getRcPorts().add(portStart + i);
 				}
 			}
 			return successful; 
@@ -104,20 +105,11 @@ public class Box {
 		}
 	}
 	
-	private List<RemoteControl> getRegisteredRCs() {
-		if (registeredRCs == null) {
-			registeredRCs = new ArrayList<RemoteControl>();
+	private List<Integer> getRcPorts() {
+		if (rcPorts == null) {
+			rcPorts = new ArrayList<Integer>();
 		}
-		return registeredRCs;
+		return rcPorts;
 	}
 
-	private static class RemoteControl {
-		String host;
-		int port;
-		public RemoteControl(String host, int port) {
-			this.host = host;
-			this.port = port;
-		}
-	}
-	
 }
