@@ -1,6 +1,7 @@
 package com.thoughtworks.selenium.grid.hub.remotecontrol;
 
 import com.thoughtworks.selenium.grid.hub.Environment;
+import com.thoughtworks.selenium.grid.hub.NoSuchEnvironmentException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -50,7 +51,13 @@ public class GlobalRemoteControlPool implements DynamicRemoteControlPool {
     }
 
     public RemoteControlProxy reserve(Environment environment) {
-        return getProvisioner(environment.name()).reserve();
+        final RemoteControlProvisioner provisioner;
+        
+        provisioner = getProvisioner(environment.name());
+        if (null == provisioner) {
+            throw new NoSuchEnvironmentException(environment.name());
+        }
+        return provisioner.reserve();
     }
 
     public void associateWithSession(RemoteControlProxy remoteControl, String sessionId) {

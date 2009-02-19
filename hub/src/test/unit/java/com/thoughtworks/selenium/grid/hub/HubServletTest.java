@@ -5,6 +5,7 @@ import com.thoughtworks.selenium.grid.hub.remotecontrol.RemoteControlProxy;
 import com.thoughtworks.selenium.grid.Response;
 import com.thoughtworks.selenium.grid.HttpParameters;
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 import org.jbehave.classmock.UsingClassMock;
 import org.jbehave.core.mock.Mock;
 import org.junit.Test;
@@ -124,6 +125,31 @@ public class HubServletTest extends UsingClassMock {
         response = servlet.forward(requestParameters, (DynamicRemoteControlPool) pool, (EnvironmentManager) environmentManager);
         assertEquals(200, response.statusCode());
         assertEquals("ERROR: an error message", response.body());
+        verifyMocks();
+    }
+
+    @SuppressWarnings({"ThrowableInstanceNeverThrown"})
+    @Test
+    public void forwardReturnAnErrorMessageWhenANoSuchEnvironmentExceptionIsThrown() throws IOException, NoSuchMethodException {
+        final HttpParameters requestParameters;
+        final Mock environmentManager;
+        final Response response;
+        final HubServlet servlet;
+        final Mock pool;
+
+        servlet = new HubServlet();
+        requestParameters = new HttpParameters();
+        requestParameters.put("cmd", "aSeleneseCommand");
+        requestParameters.put("sessionId", "a session id");
+        pool = mock(DynamicRemoteControlPool.class);
+        environmentManager = mock(EnvironmentManager.class);
+
+        pool.expects("retrieve").with("a session id").will(throwException(new NoSuchEnvironmentException("an environment")));
+
+        response = servlet.forward(requestParameters, (DynamicRemoteControlPool) pool, (EnvironmentManager) environmentManager);
+        assertEquals(200, response.statusCode());
+        assertTrue(response.body().startsWith(
+            "ERROR: Could not find any remote control providing the 'an environment' environment"));
         verifyMocks();
     }
 

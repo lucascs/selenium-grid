@@ -53,6 +53,60 @@ Installing
 Running the Demo
 ================
 
+  Tests Are Failing When I Run the Demo. How can I troubleshoot the problem?
+  --------------------------------------------------------------------------
+  
+> I started the Hub on the UNIX machine and then I've created 2 
+> remote controls on a Window laptop. This part worked and I can see the
+> Hub console listing the 2 remote controls. 
+> When I start `ant run-demo-in-parallel` on the UNIX box, however, the 
+> following error appears:
+>
+    [java] ===============================================
+    [java] Selenium Grid Demo In Parallel
+    [java] Total tests run: 4, Failures: 4, Skips: 0
+    [java] ===============================================
+>
+> How can I investigate the problem?
+
+  Here are a few things you can do to try to understand what is going on:
+  
+* Look at the TestNG report under `target/reports/index.html` on the test 
+  runner machine (the UNIX one in your case), looking for the actual error 
+  messages / stack traces.
+
+* Check the Hub and remote control logs under the `log/` directory
+
+* Look at the Windows machine where the remote controls are running: Are the
+  remote controls logging any command at all? Are browsers popping up at
+  least? Take a good look at the Selenium Remote Control logs while the tests
+  are running.
+
+  If the remote controls on the Windows machine are not even contacted, this
+  is most likely to be a setting/network/browser configuration problem. Check
+  the way you launched the hub and the remote controls, as well as your
+  network.
+
+  If the remote controls on the windows machine are contacted but fail to run
+  the tests properly, this is probably just a problem on the local machine.
+  Try to run Selenium Grid demo exclusively on this machine (or any Selenium
+  Test you have) to understand the nature of the problem in a less complex
+  environment.
+
+  If finding the actual problem still end up being hard, please 
+  [post a message in the Selenium Grid forum](http://clearspace.openqa.org/community/selenium/advanced)
+  with precise information on:
+
+* The O.S. and browser combination that you are using
+* Whether you see browsers popping up or not
+* A screenshot of the Hub console before you launch the tests
+  (The console can usually be accessed at http://localhost:4444/console
+   on the machine running the Hub)
+* The test client side errors (TestNG reports)
+* Selenium Grid Hub logs (`log/hub.log`)
+* Remote Control logs (`log/rc-*.log`)
+
+
  Running the Demo Using a Different Browser
  ------------------------------------------
  
@@ -115,51 +169,6 @@ Customizing Selenium Grid
   
 Analysing Failures
 ==================
-
-  How can I troubleshoot problems when running the demo ?
-  -------------------------------------------------------
-  
-> I started the Hub on the UNIX machine and then I've created 2 
-> remote controls on a Window laptop. This part worked and I can see the
-> Hub console listing the 2 remote controls. 
-> When I start `ant run-demo-in-parallel` on the UNIX box, however, the 
-> following error appears:
->
-    [java] ===============================================
-    [java] Selenium Grid Demo In Parallel
-    [java] Total tests run: 4, Failures: 4, Skips: 0
-    [java] ===============================================
->
-> How can I investigate the problem?
-
-  Here are a few things you can do to try to understand what is going on:
-  
-* Look at the TestNG report under `target/reports` on the test runner machine
-  (the UNIX one in your case), looking fo the actual error messages / stack
-  traces.
-
-* Look at the Windows machine where the remote controls are running: Are the
-  remote controls logging any command at all? Are browsers popping up at
-  least? Take a good look at the Selenium Remote Control logs while the tests
-  are running.
-
-  If the remote controls on the Windows machine are not even contacted, this
-  is most likely to be a setting/network/browser configuration problem. Check
-  the way you launched the hub and the remote controls, as well as your
-  network.
-
-  If the remote controls on the windows machine are contacted but fail to run
-  the tests properly, this is probably just a problem on the local machine.
-  Try to run Selenium Grid demo exclusively on this machine (or any Selenium
-  Test you have) to understand the nature of the problem in a less complex
-  environment.
-
-  If finding the actual problem still end up being hard, please 
-  [send us](http://clearspace.openqa.org/community/selenium/advanced)
-  another message with:
-
-* The test client side errors (TestNG reports)
-* The remote control logs
 
 
  When we test the application with Selenium Grid, we get nondeterministic results
@@ -364,6 +373,32 @@ Running the Examples Included in Selenium Grid Distribution
 4. Launch the tests with: `rake tests:run_in_parallel`  
 
 
+ The Ruby Example Does Not Seem to Work on Windows!
+--------------------------------------------------
+
+> When running the Ruby example on Windows I get:
+>
+> `[DeepTest] Started DeepTest service at druby://0.0.0.0:6969
+> c:/ruby/lib/ruby/gems/1.8/gems/deep_test-1.2.2/lib/deep_test.rb:15:in fork: the fork() function is unimplemented on this machine (NotImplementedError)`
+
+  This is expected. The Ruby example will *not* work on Windows.
+
+  The Ruby example demonstrates best practices for high ROI in-browser web
+  testing in Ruby. As a consequence it relies on
+  [DeepTest](http://deep-test.rubyforge.org), the best parallel and distributed
+  test runner available for Ruby. In turns, DeepTest make extensive use of
+  `Kernel.fork()`... which is not implemented on Windows.
+
+  This is not really a problem as the Ruby community has widely embraced the
+  Mac OS X and UNIX platforms which provide a far better environment to
+  execute your tests. Besides, with Selenium Grid (or Selenium RC) it is very
+  simple to run your tests on UNIX while driving a web browser running on
+  Windows. So there is no need to run your tests on Windows to test a Windows'
+  browser. Consequently I strongly advise to always run your tests on Linux or
+  Mac OS X and just target a Selenium RC running on a Windows platform when
+  you need to test Internet Explorer. You will also save yourself a lot of
+  headaches as very few Ruby users run on Windows anyway...
+  
 Running Your Tests Against Selenium Grid
 ========================================
 

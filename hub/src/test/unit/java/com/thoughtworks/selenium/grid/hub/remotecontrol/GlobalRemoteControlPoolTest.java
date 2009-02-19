@@ -1,6 +1,7 @@
 package com.thoughtworks.selenium.grid.hub.remotecontrol;
 
 import com.thoughtworks.selenium.grid.hub.Environment;
+import com.thoughtworks.selenium.grid.hub.NoSuchEnvironmentException;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertSame;
@@ -110,6 +111,25 @@ public class GlobalRemoteControlPoolTest extends UsingClassMock {
         provisioner.expects("reserve").will(returnValue(remoteControl));
         assertEquals(remoteControl, pool.reserve(new Environment("an environment", "")));
         verifyMocks();
+    }
+
+    @Test
+    public void reserveRaisesNoSuchEnvironmentExceptionWhenThereIsNoRegisteredRCForThisEnvironment() {
+        final GlobalRemoteControlPool pool;
+
+        pool = new GlobalRemoteControlPool() {
+            protected RemoteControlProvisioner getProvisioner(String environment) {
+                assertEquals("an environment", environment);
+                return null;
+            }
+        };
+
+        try {
+            pool.reserve(new Environment("an environment", ""));
+            fail("did not catch NoSuchEnvironmentException as expected");
+        } catch(NoSuchEnvironmentException e) {
+            assertEquals("an environment", e.environment());  
+        }
     }
 
     @Test

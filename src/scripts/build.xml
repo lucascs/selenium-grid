@@ -9,7 +9,7 @@
   <property name="seleniumPort" value="4444" />
   <property name="browser" value="*firefox" />
   
-  <taskdef resource="testngtasks" classpath="${basedir}/lib/testng-5.7-jdk15.jar"/>
+  <taskdef resource="testngtasks" classpath="${basedir}/vendor/testng-5.7-jdk15.jar"/>
   
   <path id="remote-control.classpath">
     <fileset dir="${basedir}/vendor">

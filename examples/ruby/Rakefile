@@ -18,7 +18,8 @@ require "selenium/rake/tasks"
 # Make sure we pick up the reporter from the appropriate selenium-client
 # install as RSpec runner --require does not discriminate between multiple
 # selenium-client gems.
-report_formatter_path = `gem which -q "selenium/rspec/reporting/selenium_test_report_formatter"`.chomp
+gem_executable = Config::CONFIG["host_os"] =~ /mswin/ ? "gem.bat" : "gem"
+report_formatter_path = `#{gem_executable} which -q "selenium/rspec/reporting/selenium_test_report_formatter"`.chomp
 report_formatter_path.gsub! /selenium-client-\d+\.\d+.\d+/, "selenium-client-1.2.7"
 
 

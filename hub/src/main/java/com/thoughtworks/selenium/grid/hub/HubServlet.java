@@ -53,6 +53,10 @@ public class HubServlet extends HttpServlet {
         } catch (CommandParsingException e) {
             logger.error("Failed to parse '" + parameters.toString() + "' : " + e.getMessage());
             return new Response(e.getMessage());
+        } catch (NoSuchEnvironmentException e) {
+            logger.error("Could not find any remote control providing the '" + e.environment() +
+                         "' environment. Please make sure you started some remote controls which registered as offering this environment.");
+            return new Response(e.getMessage());
         }
         logger.info("Responding with " + response.statusCode() + "/ '" + response.body() + "'");
 

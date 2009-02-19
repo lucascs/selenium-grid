@@ -16,7 +16,6 @@ module FlickrExample
     end
     page.go_back :wait_for => :page
     page.click "//img[@class='pc_img']", :wait_for => :page
-    page.click "link=*photostream", :wait_for => :page
   end
   
 end
