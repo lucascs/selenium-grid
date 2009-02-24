@@ -29,17 +29,23 @@ public class Box {
 	private transient List<Integer> rcPorts = new ArrayList<Integer>();
 	private String defaultEnvironment;
 	private String defaultHubUrl;
+	private transient HttpClient client;
 	
 	public static enum Status {
 		ONLINE, OFFLINE
 	}
 	public Box(String host, int port) {
+		this(host, port, new HttpClient());
+	}
+
+	Box(String host, int port, HttpClient client) {
 		this.host = host;
 		this.port = port;
 		this.defaultStartPort = 5555;
 		this.defaultQuantity = 1;
 		this.defaultEnvironment = "*firefox";
-		this.status = Status.ONLINE;
+		this.status = Status.OFFLINE;
+		this.client = client;
 	}
 
 	public int quantity() {
@@ -64,6 +70,12 @@ public class Box {
 		return port;
 	}
 
+	Status status() {
+		return this.status;
+	}
+	void setDefaultHubUrl(String url) {
+		this.defaultHubUrl = url;
+	}
 	public void setUp() {
 		if (!Status.ONLINE.equals(this.status) && defaultHubUrl != null) {
 			startRemoteControls(defaultQuantity, defaultEnvironment, defaultStartPort, new Hub(defaultHubUrl));
@@ -96,7 +108,6 @@ public class Box {
 	}
 	
 	public boolean startRemoteControls(int n, String environment, int portStart, Hub hub) {
-		HttpClient client = new HttpClient();
 		this.defaultStartPort = portStart;
 		this.defaultQuantity = n;
 		this.defaultEnvironment = environment;
@@ -105,7 +116,7 @@ public class Box {
 			String url = String.format("http://%s:%d/remote-control-manager/start?host=%s&quantity=%d&environment=%s&" +
 					"hubURL=%s&portStart=%d",
 					host, port, host, n, environment, hub.url(), portStart);
-			Response response = client.get(url);
+			Response response = client().get(url);
 			boolean successful = response.statusCode() == 200;
 			if (successful) {
 				for (int i = 0; i < n; i++) {
@@ -119,11 +130,22 @@ public class Box {
 		}
 	}
 	
-	private List<Integer> getRcPorts() {
+	List<Integer> getRcPorts() {
 		if (rcPorts == null) {
 			rcPorts = new ArrayList<Integer>();
 		}
 		return rcPorts;
+	}
+	
+	HttpClient client() {
+		if (client == null) {
+			client = new HttpClient();
+		}
+		return client;
+	}
+
+	void setStatus(Status status) {
+		this.status = status;
 	}
 
 }
