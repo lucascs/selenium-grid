@@ -3,6 +3,7 @@ package com.thoughtworks.selenium.grid.hub.management;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -12,7 +13,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Servlet in charge of shutting down the Hub.
  */
-public class LifecycleManagerServlet extends HubServlet {
+public class LifecycleManagerServlet extends HttpServlet {
 
     private static final Log LOGGER = LogFactory.getLog(LifecycleManagerServlet.class);
 	private final LifecycleManager lifecycleManager;
