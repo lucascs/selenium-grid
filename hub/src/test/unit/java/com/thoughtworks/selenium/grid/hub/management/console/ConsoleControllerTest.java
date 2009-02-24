@@ -1,122 +1,93 @@
 package com.thoughtworks.selenium.grid.hub.management.console;
 
-import com.thoughtworks.selenium.grid.hub.HubRegistry;
-import com.thoughtworks.selenium.grid.hub.Environment;
-import com.thoughtworks.selenium.grid.hub.EnvironmentManager;
-import com.thoughtworks.selenium.grid.hub.management.console.mvc.Page;
-import com.thoughtworks.selenium.grid.hub.remotecontrol.DynamicRemoteControlPool;
-import com.thoughtworks.selenium.grid.hub.remotecontrol.RemoteControlProxy;
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertSame;
-import org.jbehave.classmock.UsingClassMock;
-import org.jbehave.core.mock.Mock;
-import org.junit.Test;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletResponse;
+
+import org.jbehave.classmock.UsingClassMock;
+import org.jbehave.core.mock.Mock;
+import org.junit.Before;
+import org.junit.Test;
+
+import com.thoughtworks.selenium.grid.hub.Environment;
+import com.thoughtworks.selenium.grid.hub.EnvironmentManager;
+import com.thoughtworks.selenium.grid.hub.management.box.Box;
+import com.thoughtworks.selenium.grid.hub.management.box.BoxPool;
+import com.thoughtworks.selenium.grid.hub.management.console.mvc.Page;
+import com.thoughtworks.selenium.grid.hub.remotecontrol.DynamicRemoteControlPool;
+import com.thoughtworks.selenium.grid.hub.remotecontrol.RemoteControlProxy;
+
 public class ConsoleControllerTest extends UsingClassMock {
 
+	private ConsoleController controller;
+	private Mock environmentManager;
+	private Mock remoteControlPool;
+	private Mock boxPool;
+
+	@Before
+	public void setUp() {
+		environmentManager = mock(EnvironmentManager.class);
+		remoteControlPool = mock(DynamicRemoteControlPool.class);
+		boxPool = mock(BoxPool.class);
+		
+		controller = new ConsoleController((EnvironmentManager)environmentManager, 
+				(DynamicRemoteControlPool)remoteControlPool, (BoxPool)boxPool);
+	}
     @Test
     public void listPageTemplateIsIndex() {
-        final ConsoleController controller;
-        final Mock registry;
-
-        registry = mock(HubRegistry.class);
-        registry.stubs("environmentManager").will(returnValue(mock(EnvironmentManager.class)));
-        registry.stubs("remoteControlPool").will(returnValue(mock(DynamicRemoteControlPool.class)));
-
-        controller = new ConsoleController((HubRegistry) registry);
-        assertEquals("index.html", controller.list().template());
+    	ensureThat(controller.list().template(), is("index.html"));
         verifyMocks();
     }
 
     @Test
     public void listSetAvailableRemoteControlAssignFromRegistry() {
-        final List<RemoteControlProxy> expectedRemoteControls;
-        final ConsoleController controller;
-        final Mock remoteControlPool;
-        final Mock registry;
-
-        expectedRemoteControls = Arrays.asList(new RemoteControlProxy("", 0, "", 1, null));
-        registry = mock(HubRegistry.class);
-        remoteControlPool = mock(DynamicRemoteControlPool.class);
-        registry.stubs("environmentManager").will(returnValue(mock(EnvironmentManager.class)));
-
-        registry.stubs("remoteControlPool").will(returnValue(remoteControlPool));
+        final List<RemoteControlProxy> expectedRemoteControls = Arrays.asList(new RemoteControlProxy("", 0, "", 1, null));
         remoteControlPool.stubs("availableRemoteControls").will(returnValue(expectedRemoteControls));
 
-        controller = new ConsoleController((HubRegistry) registry);
-        assertEquals(expectedRemoteControls, controller.list().assigns().get("availableRemoteControls"));
+        ensureThat(controller.list().assigns().get("availableRemoteControls"), is(expectedRemoteControls));
         verifyMocks();
     }
 
     @Test
     public void listSetReservedRemoteControlAssignFromRegistry() {
-        final List<RemoteControlProxy> expectedRemoteControls;
-        final ConsoleController controller;
-        final Mock remoteControlPool;
-        final Mock registry;
-
-        expectedRemoteControls = Arrays.asList(new RemoteControlProxy("", 0, "", 1, null));
-        registry = mock(HubRegistry.class);
-        remoteControlPool = mock(DynamicRemoteControlPool.class);
-        registry.stubs("environmentManager").will(returnValue(mock(EnvironmentManager.class)));
-
-        registry.stubs("remoteControlPool").will(returnValue(remoteControlPool));
+        final List<RemoteControlProxy> expectedRemoteControls = Arrays.asList(new RemoteControlProxy("", 0, "", 1, null));
         remoteControlPool.stubs("reservedRemoteControls").will(returnValue(expectedRemoteControls));
-
-        controller = new ConsoleController((HubRegistry) registry);
-        assertEquals(expectedRemoteControls, controller.list().assigns().get("reservedRemoteControls"));
+        
+        ensureThat(controller.list().assigns().get("reservedRemoteControls"), is(expectedRemoteControls));
         verifyMocks();
     }
 
     @Test
     public void listSetEnvironmentsAssignFromRegistry() {
-        final List<Environment> expectedEnvironments;
-        final ConsoleController controller;
-        final Mock environmentManager;
-        final Mock registry;
-
-        expectedEnvironments = Arrays.asList(new Environment("", ""));
-        registry = mock(HubRegistry.class);
-        environmentManager = mock(EnvironmentManager.class);
-        registry.stubs("remoteControlPool").will(returnValue(mock(DynamicRemoteControlPool.class)));
-
-        registry.expects("environmentManager").will(returnValue(environmentManager));
+        final List<Environment> expectedEnvironments = Arrays.asList(new Environment("", ""));
         environmentManager.expects("environments").will(returnValue(expectedEnvironments));
 
-        controller = new ConsoleController((HubRegistry) registry);
-        assertEquals(expectedEnvironments, controller.list().assigns().get("environments"));
+        ensureThat(controller.list().assigns().get("environments"), is(expectedEnvironments));
         verifyMocks();
     }
 
     @Test
     public void processRendersThePageReturnedByTheListAction() throws IOException, ServletException {
-        final ConsoleController controller;
-        final Page expectedPage;
-        final Mock expectedResponse;
-        final Mock registry;
+        final Page expectedPage = new Page("");
+        final Mock expectedResponse = mock(HttpServletResponse.class);
 
-        expectedPage = new Page("");
-        expectedResponse = mock(HttpServletResponse.class);
-        registry = mock(HubRegistry.class);
-        registry.stubs("environmentManager").will(returnValue(mock(EnvironmentManager.class)));
-        registry.stubs("remoteControlPool").will(returnValue(mock(DynamicRemoteControlPool.class)));
+        final ConsoleController controller = new ConsoleController((EnvironmentManager)environmentManager, 
+        		(DynamicRemoteControlPool)remoteControlPool, (BoxPool)boxPool) {
 
-        controller = new ConsoleController((HubRegistry) registry) {
-
-            public Page list() {
+            @Override
+			public Page list() {
                 return expectedPage;
             }
 
-            public void render(Page page, HttpServletResponse response) throws IOException {
-                assertEquals(expectedPage, page);
-                assertSame(expectedResponse, response);
+            @Override
+			public void render(Page page, HttpServletResponse response) throws IOException {
+            	ensureThat(page, is(expectedPage));
+            	ensureThat(response, sameInstanceAs(expectedResponse));
             }
         };
 
@@ -126,20 +97,17 @@ public class ConsoleControllerTest extends UsingClassMock {
 
     @Test
     public void rendersIndexPage() throws IOException {
-        final RemoteControlProxy[] remoteControls;
-        final ConsoleController controller;
-        final Mock response;
-        final Page page;
-
-        response = mock(HttpServletResponse.class);
+        final Mock response = mock(HttpServletResponse.class);
         response.stubs("getWriter").will(returnValue(mock(PrintWriter.class)));
-        remoteControls = new RemoteControlProxy[]{new RemoteControlProxy("a host", 0, "an environment", 1, null)};
-        page = new Page("index.html");
+        
+        final RemoteControlProxy[] remoteControls = new RemoteControlProxy[]{new RemoteControlProxy("a host", 0, "an environment", 1, null)};
+        
+        final Page page = new Page("index.html");
         page.set("environments", new Environment[] { new Environment("a environment", "a browser")});
         page.set("availableRemoteControls", remoteControls);
         page.set("reservedRemoteControls", remoteControls);
+        page.set("boxes", new ArrayList<Box>());
 
-        controller = new ConsoleController(HubRegistry.registry());
         controller.render(page, (HttpServletResponse) response);
     }
 

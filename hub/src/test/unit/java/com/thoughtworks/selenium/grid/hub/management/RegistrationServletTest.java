@@ -1,49 +1,36 @@
 package com.thoughtworks.selenium.grid.hub.management;
 
-import com.thoughtworks.selenium.grid.hub.HubRegistry;
-import com.thoughtworks.selenium.grid.hub.remotecontrol.DynamicRemoteControlPool;
-import com.thoughtworks.selenium.grid.hub.remotecontrol.RemoteControlProxy;
-import static junit.framework.Assert.assertSame;
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.jbehave.classmock.UsingClassMock;
 import org.jbehave.core.mock.Mock;
 import org.junit.Test;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import com.thoughtworks.selenium.grid.hub.remotecontrol.DynamicRemoteControlPool;
+import com.thoughtworks.selenium.grid.hub.remotecontrol.RemoteControlProxy;
 
 public class RegistrationServletTest extends UsingClassMock {
 
     @Test
     public void registerSubmittedRemoteControlPool() throws IOException {
-        final RemoteControlProxy expectedRemoteControl;
-        final RegistrationServlet servlet;
-        final Mock remoteControlPool;
-        final Mock registry;
-        final Mock request;
-        final Mock expectedResponse;
-
-        request = mock(HttpServletRequest.class);
-        expectedResponse = mock(HttpServletResponse.class);
-        registry = mock(HubRegistry.class);
-        remoteControlPool = mock(DynamicRemoteControlPool.class);
-        expectedRemoteControl = new RemoteControlProxy("a host", 24, "an environment", 1, null);
-        servlet = new RegistrationServlet() {
-
-            protected HubRegistry registry() {
-                return (HubRegistry) registry;
-            }
-
-            protected void writeSuccessfulResponse(HttpServletResponse response) throws IOException {
-                assertSame(expectedResponse, response);
+    	final Mock expectedResponse = mock(HttpServletResponse.class);
+        final Mock remoteControlPool = mock(DynamicRemoteControlPool.class);
+        final RegistrationServlet servlet = new RegistrationServlet((DynamicRemoteControlPool) remoteControlPool) {
+            @Override
+			protected void writeSuccessfulResponse(HttpServletResponse response) throws IOException {
+            	ensureThat(response, sameInstanceAs(expectedResponse));
             }
         };
 
+        final Mock request = mock(HttpServletRequest.class);
+        final RemoteControlProxy expectedRemoteControl = new RemoteControlProxy("a host", 24, "an environment", 1, null);
         request.stubs("getParameter").with("host").will(returnValue(expectedRemoteControl.host()));
         request.stubs("getParameter").with("port").will(returnValue("" + expectedRemoteControl.port()));
         request.stubs("getParameter").with("environment").will(returnValue(expectedRemoteControl.environment()));
 
-        registry.expects("remoteControlPool").will(returnValue(remoteControlPool));
         remoteControlPool.expects("register").with(eq(expectedRemoteControl));
 
         servlet.process((HttpServletRequest) request, (HttpServletResponse) expectedResponse);
