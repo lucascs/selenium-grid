@@ -10,8 +10,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.thoughtworks.selenium.grid.hub.HubRegistry;
+import com.thoughtworks.selenium.grid.hub.EnvironmentManager;
 import com.thoughtworks.selenium.grid.hub.management.box.BoxPool;
+import com.thoughtworks.selenium.grid.hub.remotecontrol.DynamicRemoteControlPool;
 
 /**
  * Gateway to Selenium Farm.
@@ -22,8 +23,12 @@ public class ConsoleServlet extends HttpServlet {
 
     private static final Log logger = LogFactory.getLog(ConsoleServlet.class);
 	private final BoxPool pool;
+	private final DynamicRemoteControlPool remoteControlPool;
+	private final EnvironmentManager environmentManager;
 
-    public ConsoleServlet(BoxPool pool) {
+    public ConsoleServlet(EnvironmentManager environmentManager, DynamicRemoteControlPool remoteControlPool, BoxPool pool) {
+		this.environmentManager = environmentManager;
+		this.remoteControlPool = remoteControlPool;
 		this.pool = pool;
 	}
 
@@ -36,6 +41,6 @@ public class ConsoleServlet extends HttpServlet {
     }
 
     protected ConsoleController controller() {
-        return new ConsoleController(HubRegistry.registry(), pool);
+        return new ConsoleController(environmentManager, remoteControlPool, pool);
     }
 }

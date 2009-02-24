@@ -17,6 +17,7 @@ import com.thoughtworks.selenium.grid.hub.management.box.BoxStartupServlet;
 import com.thoughtworks.selenium.grid.hub.management.box.BoxUnregistrationServlet;
 import com.thoughtworks.selenium.grid.hub.management.box.Pinger;
 import com.thoughtworks.selenium.grid.hub.management.console.ConsoleServlet;
+import com.thoughtworks.selenium.grid.hub.remotecontrol.DynamicRemoteControlPool;
 
 /**
  * Self contained Selenium Grid Hub. Uses Jetty to as a standalone web application.
@@ -45,11 +46,14 @@ public class HubServer {
 		}
         
         HubRegistry registry = HubRegistry.registry();
-        root.addServlet(new ServletHolder(new HubServlet(registry.remoteControlPool(), registry.environmentManager())), "/selenium-server/driver/*");
-        root.addServlet(new ServletHolder(new ConsoleServlet(pool)), "/console");
-        root.addServlet(new ServletHolder(new RegistrationServlet()), "/registration-manager/register");
-        root.addServlet(new ServletHolder(new UnregistrationServlet()), "/registration-manager/unregister");
-        root.addServlet(new ServletHolder(new LifecycleManagerServlet()), "/lifecycle-manager");
+        DynamicRemoteControlPool remoteControlPool = registry.remoteControlPool();
+		EnvironmentManager environmentManager = registry.environmentManager();
+		
+		root.addServlet(new ServletHolder(new HubServlet(remoteControlPool, environmentManager)), "/selenium-server/driver/*");
+        root.addServlet(new ServletHolder(new ConsoleServlet(environmentManager, remoteControlPool, pool)), "/console");
+        root.addServlet(new ServletHolder(new RegistrationServlet(remoteControlPool)), "/registration-manager/register");
+        root.addServlet(new ServletHolder(new UnregistrationServlet(remoteControlPool)), "/registration-manager/unregister");
+        root.addServlet(new ServletHolder(new LifecycleManagerServlet(registry.lifecycleManager())), "/lifecycle-manager");
 
         root.addServlet(new ServletHolder(new BoxRegistrationServlet(pool, boxFile)), "/box-registration-manager/register");
         root.addServlet(new ServletHolder(new BoxUnregistrationServlet(pool, boxFile)), "/box-registration-manager/unregister");
