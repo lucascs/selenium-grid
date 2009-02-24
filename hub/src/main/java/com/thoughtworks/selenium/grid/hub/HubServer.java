@@ -39,15 +39,15 @@ public class HubServer {
         root = new Context(contexts, "/", Context.SESSIONS);
 //        root.setResourceBase("./");
 //        root.addHandler(new ResourceHandler());
-        BoxPool pool = new BoxPool();
-        File boxFile = new File("boxes.xml");
-        if (boxFile.exists()) {
-			pool.loadFrom(boxFile);
-		}
         
         HubRegistry registry = HubRegistry.registry();
         DynamicRemoteControlPool remoteControlPool = registry.remoteControlPool();
 		EnvironmentManager environmentManager = registry.environmentManager();
+		BoxPool pool = new BoxPool(remoteControlPool);
+		File boxFile = new File("boxes.xml");
+		if (boxFile.exists()) {
+			pool.loadFrom(boxFile);
+		}
 		
 		root.addServlet(new ServletHolder(new HubServlet(remoteControlPool, environmentManager)), "/selenium-server/driver/*");
         root.addServlet(new ServletHolder(new ConsoleServlet(environmentManager, remoteControlPool, pool)), "/console");
@@ -59,7 +59,7 @@ public class HubServer {
         root.addServlet(new ServletHolder(new BoxUnregistrationServlet(pool, boxFile)), "/box-registration-manager/unregister");
         root.addServlet(new ServletHolder(new BoxStartupServlet(pool, boxFile)), "/box-registration-manager/start");
 
-        Thread thread = new Thread(new Pinger(pool));
+        Thread thread = new Thread(new Pinger(remoteControlPool, pool));
         thread.setDaemon(false);
 		thread.start();
         server.start();

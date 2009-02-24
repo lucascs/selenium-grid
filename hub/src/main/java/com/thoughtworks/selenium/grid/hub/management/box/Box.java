@@ -10,7 +10,6 @@ import org.apache.commons.logging.LogFactory;
 import com.thoughtworks.selenium.grid.HttpClient;
 import com.thoughtworks.selenium.grid.Response;
 import com.thoughtworks.selenium.grid.hub.Hub;
-import com.thoughtworks.selenium.grid.hub.HubRegistry;
 import com.thoughtworks.selenium.grid.hub.remotecontrol.DynamicRemoteControlPool;
 import com.thoughtworks.selenium.grid.hub.remotecontrol.RemoteControlProxy;
 /**
@@ -71,13 +70,12 @@ public class Box {
 		}
 		this.status = Status.ONLINE;
 	}
-	public void setDown() {
-		killRemotes();
+	public void setDown(DynamicRemoteControlPool pool) {
+		killRemotes(pool);
 		this.status = Status.OFFLINE;
 	}
 	
-	private void killRemotes() {
-		DynamicRemoteControlPool pool = HubRegistry.registry().remoteControlPool();
+	private void killRemotes(DynamicRemoteControlPool pool) {
 		List<RemoteControlProxy> rcs = new ArrayList<RemoteControlProxy>();
 		rcs.addAll(pool.availableRemoteControls());
 		rcs.addAll(pool.reservedRemoteControls());

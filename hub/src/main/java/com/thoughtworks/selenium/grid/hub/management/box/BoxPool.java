@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.thoughtworks.selenium.grid.hub.remotecontrol.DynamicRemoteControlPool;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
@@ -18,6 +19,11 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  */
 public class BoxPool {
 
+	private final DynamicRemoteControlPool remoteControlPool;
+
+	public BoxPool(DynamicRemoteControlPool remoteControlPool) {
+		this.remoteControlPool = remoteControlPool;
+	}
 	private List<Box> boxes = new ArrayList<Box>();
 
 	public void register(Box box) {
@@ -67,7 +73,7 @@ public class BoxPool {
 
 	public void unregister(Box box) {
 		Box loaded = load(box);
-		loaded.setDown();
+		loaded.setDown(remoteControlPool);
 		boxes.remove(loaded);
 	}
 

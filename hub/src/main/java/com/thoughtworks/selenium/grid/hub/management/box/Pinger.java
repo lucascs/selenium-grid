@@ -8,7 +8,6 @@ import org.apache.commons.logging.LogFactory;
 
 import com.thoughtworks.selenium.grid.HttpClient;
 import com.thoughtworks.selenium.grid.Response;
-import com.thoughtworks.selenium.grid.hub.HubRegistry;
 import com.thoughtworks.selenium.grid.hub.remotecontrol.DynamicRemoteControlPool;
 import com.thoughtworks.selenium.grid.hub.remotecontrol.RemoteControlProxy;
 
@@ -21,10 +20,12 @@ import com.thoughtworks.selenium.grid.hub.remotecontrol.RemoteControlProxy;
 public class Pinger implements Runnable {
 	private static final Log LOGGER = LogFactory.getLog(Pinger.class);
 	private static final int SECONDS = 1000;
-	private final BoxPool pool;
+	private final BoxPool boxPool;
+	private final DynamicRemoteControlPool remoteControlPool;
 
-	public Pinger(BoxPool pool) {
-		this.pool = pool;
+	public Pinger(DynamicRemoteControlPool remoteControlPool, BoxPool boxPool) {
+		this.remoteControlPool = remoteControlPool;
+		this.boxPool = boxPool;
 	}
 
 	public void run() {
@@ -40,22 +41,21 @@ public class Pinger implements Runnable {
 	}
 
 	private void pingRemotes() {
-		DynamicRemoteControlPool rcPool = HubRegistry.registry().remoteControlPool();
 		ArrayList<RemoteControlProxy> rcs = new ArrayList<RemoteControlProxy>();
-		rcs.addAll(rcPool.availableRemoteControls());
-		rcs.addAll(rcPool.reservedRemoteControls());
+		rcs.addAll(remoteControlPool.availableRemoteControls());
+		rcs.addAll(remoteControlPool.reservedRemoteControls());
 		for (RemoteControlProxy proxy : rcs) {
 			try {
 				new HttpClient().get("http://" + proxy.host() + ":" + proxy.port());
 			} catch (IOException e) {
 				LOGGER.warn(proxy + " is down", e);
-				rcPool.unregister(proxy);
+				remoteControlPool.unregister(proxy);
 			}
 		}
 	}
 	
 	private void pingBoxes() {
-		for (Box box : pool.getBoxes()) {
+		for (Box box : boxPool.getBoxes()) {
 			try {
 				Response response = new HttpClient().get("http://" + box.host() + ":" + box.port() + "/ping");
 				if (response.statusCode() == 200) {
@@ -66,7 +66,7 @@ public class Pinger implements Runnable {
 				// should live forever
 				LOGGER.warn(e);
 			}
-			box.setDown();
+			box.setDown(remoteControlPool);
 		}
 	}
 
