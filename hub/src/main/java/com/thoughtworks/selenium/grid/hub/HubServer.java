@@ -44,7 +44,8 @@ public class HubServer {
 			pool.loadFrom(boxFile);
 		}
         
-        root.addServlet(new ServletHolder(new HubServlet()), "/selenium-server/driver/*");
+        HubRegistry registry = HubRegistry.registry();
+        root.addServlet(new ServletHolder(new HubServlet(registry.remoteControlPool(), registry.environmentManager())), "/selenium-server/driver/*");
         root.addServlet(new ServletHolder(new ConsoleServlet(pool)), "/console");
         root.addServlet(new ServletHolder(new RegistrationServlet()), "/registration-manager/register");
         root.addServlet(new ServletHolder(new UnregistrationServlet()), "/registration-manager/unregister");

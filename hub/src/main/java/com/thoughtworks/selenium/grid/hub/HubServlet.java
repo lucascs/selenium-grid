@@ -1,17 +1,19 @@
 package com.thoughtworks.selenium.grid.hub;
 
-import com.thoughtworks.selenium.grid.hub.remotecontrol.DynamicRemoteControlPool;
-import com.thoughtworks.selenium.grid.Response;
-import com.thoughtworks.selenium.grid.HttpParameters;
-import com.thoughtworks.selenium.grid.hub.remotecontrol.commands.SeleneseCommand;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.io.IOException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.thoughtworks.selenium.grid.HttpParameters;
+import com.thoughtworks.selenium.grid.Response;
+import com.thoughtworks.selenium.grid.hub.remotecontrol.DynamicRemoteControlPool;
+import com.thoughtworks.selenium.grid.hub.remotecontrol.commands.SeleneseCommand;
 
 /**
  * Main entry point for the Hub and the Selenium Farm.
@@ -20,25 +22,29 @@ import java.io.IOException;
 public class HubServlet extends HttpServlet {
 
     private final static Log logger = LogFactory.getLog(HubServer.class);
+	private final DynamicRemoteControlPool remoteControlPool;
+	private final EnvironmentManager environmentManager;
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    public HubServlet(DynamicRemoteControlPool remoteControlPool, EnvironmentManager environmentManager) {
+		this.remoteControlPool = remoteControlPool;
+		this.environmentManager = environmentManager;
+	}
+
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         process(request, response);
     }
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    @Override
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         process(request, response);
     }
 
     protected void process(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        final Response remoteControlResponse;
-        final HubRegistry registry;
-        final HttpParameters parameters;
-
-        registry = HubRegistry.registry();
-        parameters = requestParameters(request);
-        remoteControlResponse = forward(parameters, registry.remoteControlPool(), registry.environmentManager());
+        final HttpParameters parameters = requestParameters(request);
+		final Response remoteControlResponse = forward(parameters, remoteControlPool, environmentManager);
         reply(response, remoteControlResponse);
     }
 
