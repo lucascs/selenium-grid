@@ -1,5 +1,7 @@
 package com.thoughtworks.selenium.grid.hub;
 
+import java.io.File;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -7,6 +9,7 @@ import com.thoughtworks.selenium.grid.configuration.EnvironmentConfiguration;
 import com.thoughtworks.selenium.grid.configuration.GridConfiguration;
 import com.thoughtworks.selenium.grid.configuration.ResourceLocator;
 import com.thoughtworks.selenium.grid.hub.management.LifecycleManager;
+import com.thoughtworks.selenium.grid.hub.management.box.BoxPool;
 import com.thoughtworks.selenium.grid.hub.remotecontrol.DynamicRemoteControlPool;
 import com.thoughtworks.selenium.grid.hub.remotecontrol.GlobalRemoteControlPool;
 
@@ -22,6 +25,7 @@ public class HubRegistry {
     private EnvironmentManager environmentManager;
     private GridConfiguration gridConfiguration;
     private LifecycleManager lifecycleManager;
+	private BoxPool boxPool;
 
     public synchronized DynamicRemoteControlPool remoteControlPool() {
         if (null == pool) {
@@ -56,6 +60,19 @@ public class HubRegistry {
             lifecycleManager = new LifecycleManager();
         }
         return lifecycleManager;
+    }
+    
+    public synchronized File boxFile() {
+    	return new File("boxes.xml");
+    }
+    public synchronized BoxPool boxPool() {
+    	if (boxPool == null) {
+	    	boxPool = new BoxPool(remoteControlPool());
+	    	if (boxFile().exists()) {
+	    		boxPool.loadFrom(boxFile());
+	    	}
+    	}
+		return boxPool;
     }
 
 }

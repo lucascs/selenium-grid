@@ -27,21 +27,17 @@ public class HubServer {
     public static void main(String[] args) throws Exception {
         final HubRegistry registry = new HubRegistry();
         final HubConfiguration configuration = registry.gridConfiguration().getHub();
-        final Server server = new Server(configuration.getPort());
-
-        final ContextHandlerCollection contexts = new ContextHandlerCollection();
-        server.setHandler(contexts);
-
-        final Context root = new Context(contexts, "/", Context.SESSIONS);
-        
-        DynamicRemoteControlPool remoteControlPool = registry.remoteControlPool();
-		EnvironmentManager environmentManager = registry.environmentManager();
-		BoxPool pool = new BoxPool(remoteControlPool);
-		File boxFile = new File("boxes.xml");
-		if (boxFile.exists()) {
-			pool.loadFrom(boxFile);
-		}
+        final DynamicRemoteControlPool remoteControlPool = registry.remoteControlPool();
+		final EnvironmentManager environmentManager = registry.environmentManager();
+		final File boxFile = registry.boxFile();
+		final BoxPool pool = registry.boxPool();
 		
+		final Server server = new Server(configuration.getPort());
+		
+		final ContextHandlerCollection contexts = new ContextHandlerCollection();
+		server.setHandler(contexts);
+		
+		final Context root = new Context(contexts, "/", Context.SESSIONS);
 		root.addServlet(new ServletHolder(new HubServlet(remoteControlPool, environmentManager)), "/selenium-server/driver/*");
         root.addServlet(new ServletHolder(new ConsoleServlet(environmentManager, remoteControlPool, pool)), "/console");
         root.addServlet(new ServletHolder(new RegistrationServlet(remoteControlPool)), "/registration-manager/register");
