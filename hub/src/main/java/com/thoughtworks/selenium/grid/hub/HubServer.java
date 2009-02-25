@@ -25,22 +25,15 @@ import com.thoughtworks.selenium.grid.hub.remotecontrol.DynamicRemoteControlPool
 public class HubServer {
 
     public static void main(String[] args) throws Exception {
-        final ContextHandlerCollection contexts;
-        final HubConfiguration configuration;
-        final Server server;
-        final Context root;
+        final HubRegistry registry = new HubRegistry();
+        final HubConfiguration configuration = registry.gridConfiguration().getHub();
+        final Server server = new Server(configuration.getPort());
 
-        configuration = HubRegistry.registry().gridConfiguration().getHub();
-        server = new Server(configuration.getPort());
-
-        contexts = new ContextHandlerCollection();
+        final ContextHandlerCollection contexts = new ContextHandlerCollection();
         server.setHandler(contexts);
 
-        root = new Context(contexts, "/", Context.SESSIONS);
-//        root.setResourceBase("./");
-//        root.addHandler(new ResourceHandler());
+        final Context root = new Context(contexts, "/", Context.SESSIONS);
         
-        HubRegistry registry = HubRegistry.registry();
         DynamicRemoteControlPool remoteControlPool = registry.remoteControlPool();
 		EnvironmentManager environmentManager = registry.environmentManager();
 		BoxPool pool = new BoxPool(remoteControlPool);

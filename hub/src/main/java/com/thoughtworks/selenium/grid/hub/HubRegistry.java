@@ -18,18 +18,10 @@ import com.thoughtworks.selenium.grid.hub.remotecontrol.GlobalRemoteControlPool;
 public class HubRegistry {
 
     private static final Log LOGGER = LogFactory.getLog(HubRegistry.class);
-    private static HubRegistry singleton;
     private DynamicRemoteControlPool pool;
     private EnvironmentManager environmentManager;
     private GridConfiguration gridConfiguration;
     private LifecycleManager lifecycleManager;
-
-    public static synchronized HubRegistry registry() {
-        if (null == singleton) {
-            singleton = new HubRegistry();
-        }
-        return singleton;
-    }
 
     public synchronized DynamicRemoteControlPool remoteControlPool() {
         if (null == pool) {
