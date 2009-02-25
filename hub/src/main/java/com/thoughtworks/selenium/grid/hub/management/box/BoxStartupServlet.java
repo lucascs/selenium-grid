@@ -13,6 +13,18 @@ import com.thoughtworks.selenium.grid.hub.Hub;
 import com.thoughtworks.selenium.grid.hub.management.RegistrationManagementServlet;
 
 /**
+ * Starts the Remote Controls from a given Box.
+ * 
+ * Request parameters:
+ * <ul>
+ * 	<li><b>host:</b> Box Host 
+ * 	<li><b>port:</b> Box port 
+ * 	<li><b>hubURL:</b> URL where HubServer is running 
+ * 	<li><b>quantity:</b> Number of Remote Controls to be started from this box 
+ * 	<li><b>portStart:</b> First port to register Remote controls. Registered Remote Controls ports
+ * 	will be at range [portStart, ... , portStart + quantity]</li>
+ *  <li><b>environment:</b> Environment to use in all Remote controls
+ * </ul>
  * 
  * @author Lucas Cavalcanti
  * @author Guilherme Silveira

@@ -13,6 +13,8 @@ import com.thoughtworks.selenium.grid.hub.Hub;
 import com.thoughtworks.selenium.grid.hub.remotecontrol.DynamicRemoteControlPool;
 import com.thoughtworks.selenium.grid.hub.remotecontrol.RemoteControlProxy;
 /**
+ * Holds the information of a Box Agent Server. Registers and Unregisters Remote Controls.
+ * A Box Agent Server must be running in order to register Remote controls.
  * 
  * @author Lucas Cavalcanti
  * @author Guilherme Silveira

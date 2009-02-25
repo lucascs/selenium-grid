@@ -12,6 +12,8 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
+ * Manages all registered Box instances. Can save and load the registered boxes information
+ * from a given file.
  * 
  * @author Lucas Cavalcanti
  * @author Guilherme Silveira

@@ -12,7 +12,13 @@ import org.apache.commons.logging.LogFactory;
 import com.thoughtworks.selenium.grid.hub.management.RegistrationManagementServlet;
 
 /**
+ * Unregisters a box from the BoxPool
  * 
+ * Request parameters:
+ * <ul>
+ * 	<li><b>host:</b> Box Host</li> 
+ * 	<li><b>port:</b> Box port</li> 
+ * </ul>
  * @author Lucas Cavalcanti
  * @author Guilherme Silveira
  *

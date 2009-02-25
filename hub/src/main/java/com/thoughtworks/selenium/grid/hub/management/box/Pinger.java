@@ -12,6 +12,11 @@ import com.thoughtworks.selenium.grid.hub.remotecontrol.DynamicRemoteControlPool
 import com.thoughtworks.selenium.grid.hub.remotecontrol.RemoteControlProxy;
 
 /**
+ * Will ping all RemoteControls from remoteControlPool and all Box from boxPool, every minute.
+ * If a Box is not reachable, its status is set OFFLINE and all its remote controls will be
+ * unregistered from the remoteControlPool. When he gets reachable again, its remote controls will be
+ * registered.
+ * If a Remote Control is not reachable, it will be unregistered from the remoteControlPool.
  * 
  * @author Lucas Cavalcanti
  * @author Guilherme Silveira
